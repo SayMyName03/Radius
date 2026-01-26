@@ -201,13 +201,7 @@ Radius uses JWT-based authentication with secure password handling:
 4. Push to branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 💬 Support
-
-For support, email support@radius.app or open an issue in the repository.
 
 ## 🙏 Acknowledgments
 
@@ -217,4 +211,4 @@ For support, email support@radius.app or open an issue in the repository.
 
 ---
 
-**Made with ❤️ by the Radius team**
+
