@@ -1,27 +1,37 @@
 # Radius - AI-Powered Lead Generation Platform
+<img width="1902" height="917" alt="image" src="https://github.com/user-attachments/assets/2b59c4ad-83b5-4302-8bd4-240bf8ef79f9" />
+
 
 A modern, intelligent lead generation platform that leverages web scraping, AI-powered interview preparation, and analytics to help you identify, qualify, and convert high-quality job candidates.
 
 ## 🚀 Features
 
 ### Smart Job Scraping
+<img width="1895" height="911" alt="image" src="https://github.com/user-attachments/assets/2ca11d36-4566-4460-ae42-b2a09534cce2" />
+
 - Automatically scrape job listings from multiple sources
 - Extract and organize job data with intelligent parsing
 - Real-time job market insights and trends
 
 ### AI Interview Prep Guides
+<img width="1112" height="810" alt="image" src="https://github.com/user-attachments/assets/120b8656-ee57-49a4-904d-152b0cbb6ba9" />
+
 - Generate personalized interview preparation guides powered by AI
 - Covers technical topics, coding, system design, and behavioral questions
 - Company-specific tips and insights
 - Focus areas tailored to the job role
 
 ### Lead Management
+<img width="1903" height="790" alt="image" src="https://github.com/user-attachments/assets/e7911acc-5908-409a-ba3c-639475bc6ef8" />
+
 - Centralized lead database with detailed profiles
 - Track lead status and conversion funnel
 - Email and meeting scheduling directly from the platform
 - Job application history and notes
 
 ### Analytics Dashboard
+<img width="1594" height="832" alt="image" src="https://github.com/user-attachments/assets/abbe18a3-98c1-4164-bc1d-6ec178fe13f4" />
+
 - Track conversion rates and key metrics
 - Monitor lead sources and performance
 - Visual analytics for data-driven decisions
