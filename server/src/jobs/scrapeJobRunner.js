@@ -5,6 +5,8 @@
 
 import { IndeedScraper } from '../scrapers/IndeedScraper.js';
 import { PlaywrightIndeedScraper } from '../scrapers/PlaywrightIndeedScraper.js';
+import { NaukriScraper } from '../scrapers/NaukriScraper.js';
+import { PlaywrightNaukriScraper } from '../scrapers/PlaywrightNaukriScraper.js';
 
 /**
  * Execute a scraping job
@@ -161,6 +163,31 @@ function selectScraper(targetUrl, options = {}) {
     // Default: Use axios + cheerio (faster, simpler)
     console.log('Using axios + cheerio scraper');
     return new IndeedScraper({
+      baseUrl,
+      timeout: 30000,
+      maxRetries: 3,
+      delayBetweenRequests: 2000,
+    });
+  }
+  
+  // Naukri.com scraper
+  if (url.includes('naukri.com')) {
+    const baseUrl = 'https://www.naukri.com';
+    
+    // Use Playwright if requested (better for JavaScript-heavy pages)
+    if (usePlaywright) {
+      console.log('Using Playwright browser automation for Naukri');
+      return new PlaywrightNaukriScraper({
+        baseUrl,
+        headless,
+        timeout: 60000,
+        delayBetweenRequests: 2000,
+      });
+    }
+    
+    // Default: Use axios + cheerio (faster, simpler)
+    console.log('Using axios + cheerio scraper for Naukri');
+    return new NaukriScraper({
       baseUrl,
       timeout: 30000,
       maxRetries: 3,

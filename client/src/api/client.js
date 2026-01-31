@@ -92,6 +92,11 @@ export const triggerIndeedScrape = async (params) => {
   return response.data;
 };
 
+export const triggerNaukriScrape = async (params) => {
+  const response = await apiClient.post('/dev/scrape/naukri', params);
+  return response.data;
+};
+
 // ─────────────────────────────────────────────────────────────
 // Lead Endpoints
 // ─────────────────────────────────────────────────────────────

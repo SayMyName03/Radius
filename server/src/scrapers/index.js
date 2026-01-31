@@ -16,9 +16,13 @@
  * - Axios (HTTP requests)
  * 
  * Available scrapers:
- * - IndeedScraper.js              → Indeed job listings scraper (axios + cheerio)
- * - PlaywrightIndeedScraper.js    → Indeed scraper using Playwright browser automation
+ * - IndeedScraper.js               → Indeed job listings scraper (axios + cheerio)
+ * - PlaywrightIndeedScraper.js     → Indeed scraper using Playwright browser automation
+ * - NaukriScraper.js               → Naukri.com job listings scraper (axios + cheerio)
+ * - PlaywrightNaukriScraper.js     → Naukri scraper using Playwright browser automation
  */
 
 export { IndeedScraper } from './IndeedScraper.js';
 export { PlaywrightIndeedScraper } from './PlaywrightIndeedScraper.js';
+export { NaukriScraper } from './NaukriScraper.js';
+export { PlaywrightNaukriScraper } from './PlaywrightNaukriScraper.js';

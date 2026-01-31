@@ -16,17 +16,19 @@ const leadSchema = new mongoose.Schema(
       index: true, // For search/sort operations
     },
     
+    // Email field - NOT globally unique because different users can
+    // have leads with the same email. Uniqueness is enforced per-user
+    // via a compound index on (createdBy, email).
     email: {
       type: String,
       required: [true, 'Email is required'],
-      unique: true,
       lowercase: true,
       trim: true,
       match: [
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         'Please provide a valid email address',
       ],
-      index: true, // For uniqueness and lookups
+      index: true, // For lookups
     },
     
     phone: {
@@ -80,6 +82,20 @@ const leadSchema = new mongoose.Schema(
       index: true, // Link to scraping job
     },
     
+    // ─────────────────────────────────────────────────────────────
+    // USER OWNERSHIP - Critical for data isolation
+    // ─────────────────────────────────────────────────────────────
+    // Each lead MUST be associated with the user who created/scraped it.
+    // This enables user-level data isolation where users can only see
+    // their own leads. Without this field, all users would see all leads
+    // which is a security and privacy concern.
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Lead must belong to a user'],
+      index: true, // Indexed for fast user-scoped queries
+    },
+    
     // Additional structured data (flexible for future extensions)
     metadata: {
       type: Map,
@@ -130,6 +146,16 @@ leadSchema.index({ source: 1, createdAt: -1 });
 
 // Get leads by job
 leadSchema.index({ jobId: 1, createdAt: -1 });
+
+// User-scoped queries - CRITICAL for data isolation
+// All lead queries should be scoped by user (createdBy)
+leadSchema.index({ createdBy: 1, createdAt: -1 });
+leadSchema.index({ createdBy: 1, status: 1, createdAt: -1 });
+leadSchema.index({ createdBy: 1, source: 1, createdAt: -1 });
+
+// Unique email per user - prevents duplicate leads for the same user
+// Different users CAN have leads with the same email
+leadSchema.index({ createdBy: 1, email: 1 }, { unique: true });
 
 // Text search on name, email, company
 leadSchema.index({ name: 'text', email: 'text', company: 'text' });

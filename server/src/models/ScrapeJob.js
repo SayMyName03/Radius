@@ -43,6 +43,19 @@ const scrapeJobSchema = new mongoose.Schema(
       max: [100, 'Max pages cannot exceed 100'],
     },
     
+    // ─────────────────────────────────────────────────────────────
+    // USER OWNERSHIP - Critical for data isolation
+    // ─────────────────────────────────────────────────────────────
+    // Each scrape job MUST be associated with the user who created it.
+    // This enables user-level data isolation and audit trails.
+    // Future: Can be used for job-level access control.
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Scrape job must belong to a user'],
+      index: true, // For fast user-scoped queries
+    },
+    
     // Job Status & Execution
     status: {
       type: String,
@@ -188,6 +201,11 @@ const scrapeJobSchema = new mongoose.Schema(
 
 // Filter by status + sort by creation date (most common)
 scrapeJobSchema.index({ status: 1, createdAt: -1 });
+
+// User-scoped queries - for data isolation
+// All job queries should be scoped by user (createdBy)
+scrapeJobSchema.index({ createdBy: 1, createdAt: -1 });
+scrapeJobSchema.index({ createdBy: 1, status: 1, createdAt: -1 });
 
 // Get scheduled jobs that need to run
 scrapeJobSchema.index({ 'schedule.enabled': 1, 'schedule.nextRun': 1 });

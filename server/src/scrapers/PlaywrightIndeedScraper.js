@@ -28,6 +28,8 @@ export class PlaywrightIndeedScraper {
     this.config = {
       headless: config.headless !== false, // Default to headless
       timeout: config.timeout || 180000, // 3 minutes for browser operations
+      navigationTimeout: config.navigationTimeout || 30000, // 30 seconds for page navigation
+      evaluateTimeout: config.evaluateTimeout || 60000, // 1 minute for page evaluation
       delayBetweenRequests: config.delayBetweenRequests || 2000,
       ...config,
     };

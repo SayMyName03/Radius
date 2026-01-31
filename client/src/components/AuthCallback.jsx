@@ -20,7 +20,7 @@ const AuthCallback = () => {
   const [status, setStatus] = useState('processing');
 
   useEffect(() => {
-    const handleCallback = () => {
+    const handleCallback = async () => {
       // Get token or error from URL parameters
       const token = searchParams.get('token');
       const error = searchParams.get('error');
@@ -42,13 +42,13 @@ const AuthCallback = () => {
         console.log('[OAuth] Token received, logging in...');
         
         try {
-          // Log user in with the token
-          loginWithGoogle(token);
+          // Log user in with the token and wait for completion
+          await loginWithGoogle(token);
           setStatus('success');
           
           // Redirect to dashboard
           setTimeout(() => {
-            navigate('/', { replace: true });
+            navigate('/dashboard', { replace: true });
           }, 1000);
         } catch (err) {
           console.error('[OAuth] Login failed:', err);

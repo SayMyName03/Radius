@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { triggerIndeedScrape } from '../api/client';
+import { triggerIndeedScrape, triggerNaukriScrape } from '../api/client';
 
 const CreateScrapeJob = () => {
   const [tags, setTags] = useState(['Software Engineer', 'Remote']);
@@ -7,11 +7,25 @@ const CreateScrapeJob = () => {
   const [location, setLocation] = useState('Bengaluru, India');
   const [maxPages, setMaxPages] = useState(3);
   const [usePlaywright, setUsePlaywright] = useState(true);
+  const [platform, setPlatform] = useState('indeed'); // 'indeed' or 'naukri'
   
   // UI state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+
+  const platformOptions = {
+    indeed: {
+      name: 'Indeed',
+      url: 'in.indeed.com/jobs',
+      triggerFn: triggerIndeedScrape,
+    },
+    naukri: {
+      name: 'Naukri.com',
+      url: 'www.naukri.com',
+      triggerFn: triggerNaukriScrape,
+    },
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && inputText) {
@@ -41,7 +55,8 @@ const CreateScrapeJob = () => {
     setResult(null);
     
     try {
-      const response = await triggerIndeedScrape({
+      const scrapeFunction = platformOptions[platform].triggerFn;
+      const response = await scrapeFunction({
         keyword: tags.join(' '),
         location: location.trim(),
         maxPages: maxPages,
@@ -75,6 +90,59 @@ const CreateScrapeJob = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200/60 overflow-hidden">
         <div className="p-6 md:p-8 space-y-8">
           
+          {/* Platform Selection */}
+          <div className="space-y-4">
+            <label className="block text-sm font-semibold text-gray-900">
+              Job Board Platform
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPlatform('indeed')}
+                disabled={isLoading}
+                className={`relative flex items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
+                  platform === 'indeed'
+                    ? 'border-gray-900 bg-gray-50 shadow-sm'
+                    : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                <div className="text-center">
+                  <div className="text-sm font-semibold text-gray-900">Indeed</div>
+                  <div className="text-xs text-gray-500 mt-1">Global job search</div>
+                </div>
+                {platform === 'indeed' && (
+                  <div className="absolute top-2 right-2">
+                    <svg className="w-5 h-5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setPlatform('naukri')}
+                disabled={isLoading}
+                className={`relative flex items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
+                  platform === 'naukri'
+                    ? 'border-gray-900 bg-gray-50 shadow-sm'
+                    : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                <div className="text-center">
+                  <div className="text-sm font-semibold text-gray-900">Naukri.com</div>
+                  <div className="text-xs text-gray-500 mt-1">India's #1 job site</div>
+                </div>
+                {platform === 'naukri' && (
+                  <div className="absolute top-2 right-2">
+                    <svg className="w-5 h-5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </button>
+            </div>
+          </div>
+          
           {/* URL Input */}
           <div className="space-y-4">
             <label htmlFor="url" className="block text-sm font-semibold text-gray-900">
@@ -87,7 +155,7 @@ const CreateScrapeJob = () => {
                 <input
                     type="text"
                     id="url"
-                    value="in.indeed.com/jobs"
+                    value={platformOptions[platform].url}
                     disabled
                     className="block w-full pl-16 pr-4 py-3 bg-gray-100 border border-gray-200 text-gray-600 text-sm rounded-xl cursor-not-allowed"
                 />

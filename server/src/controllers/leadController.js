@@ -1,6 +1,19 @@
 /**
  * Lead Controller
  * Handles HTTP requests for lead management
+ * 
+ * ─────────────────────────────────────────────────────────────────────────────
+ * USER DATA ISOLATION
+ * ─────────────────────────────────────────────────────────────────────────────
+ * All lead operations are scoped to the authenticated user (req.user).
+ * This ensures users can only access, modify, and delete their own leads.
+ * 
+ * The auth middleware (protect) MUST be applied to all routes before these
+ * controller methods are called. This guarantees req.user is populated.
+ * 
+ * NEVER trust client-provided user IDs. Always use req.user.id from the
+ * authenticated session.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 
 import AppError from '../utils/AppError.js';
@@ -8,8 +21,10 @@ import leadService from '../services/leadService.js';
 
 export const leadController = {
   /**
-   * Get all leads with filtering and pagination
+   * Get all leads for the authenticated user with filtering and pagination
    * GET /api/v1/leads?status=new&source=LinkedIn&page=1&limit=20
+   * 
+   * SECURITY: Only returns leads where createdBy === req.user.id
    */
   getAllLeads: async (req, res, next) => {
     try {
@@ -21,8 +36,16 @@ export const leadController = {
         throw new AppError('Invalid pagination parameters', 400);
       }
 
-      // Call service layer
-      const result = await leadService.findAll({ status, source, search, page, limit });
+      // Call service layer with user ID for data isolation
+      // CRITICAL: Pass req.user.id to ensure user only sees their own leads
+      const result = await leadService.findAll({ 
+        userId: req.user.id, // User ID from authenticated session
+        status, 
+        source, 
+        search, 
+        page, 
+        limit 
+      });
 
       res.status(200).json({
         success: true,
@@ -43,8 +66,10 @@ export const leadController = {
   },
 
   /**
-   * Get single lead by ID
+   * Get single lead by ID (with ownership verification)
    * GET /api/v1/leads/:id
+   * 
+   * SECURITY: Only returns the lead if it belongs to req.user
    */
   getLeadById: async (req, res, next) => {
     try {
@@ -54,14 +79,9 @@ export const leadController = {
         throw new AppError('Lead ID is required', 400);
       }
 
-      // Call service layer
-      // const lead = await leadService.findById(id);
-      const lead = { 
-        id, 
-        name: 'John Doe', 
-        email: 'john@example.com',
-        status: 'new',
-      }; // Placeholder
+      // Call service layer with user ID for ownership verification
+      // CRITICAL: Service will verify the lead belongs to this user
+      const lead = await leadService.findById(id, req.user.id);
 
       res.status(200).json({
         success: true,
@@ -73,8 +93,10 @@ export const leadController = {
   },
 
   /**
-   * Create new lead
+   * Create new lead (owned by authenticated user)
    * POST /api/v1/leads
+   * 
+   * SECURITY: Lead is automatically assigned to req.user
    */
   createLead: async (req, res, next) => {
     try {
@@ -85,8 +107,12 @@ export const leadController = {
         throw new AppError('Name and email are required', 400);
       }
 
-      // Call service layer
-      const lead = await leadService.create(leadData);
+      // Call service layer with createdBy set to authenticated user
+      // CRITICAL: Never trust client-provided createdBy - always use req.user.id
+      const lead = await leadService.create({
+        ...leadData,
+        createdBy: req.user.id, // Assign ownership to authenticated user
+      });
 
       res.status(201).json({
         success: true,
@@ -98,12 +124,16 @@ export const leadController = {
   },
   
   /**
-   * Get lead statistics
+   * Get lead statistics for the authenticated user
    * GET /api/v1/leads/stats
+   * 
+   * SECURITY: Only returns stats for leads owned by req.user
    */
   getStats: async (req, res, next) => {
     try {
-      const stats = await leadService.getStats();
+      // Call service layer with user ID for data isolation
+      // CRITICAL: Stats are scoped to user's own leads only
+      const stats = await leadService.getStats(req.user.id);
       
       res.status(200).json({
         success: true,
@@ -115,8 +145,10 @@ export const leadController = {
   },
 
   /**
-   * Update lead
+   * Update lead (with ownership verification)
    * PATCH /api/v1/leads/:id
+   * 
+   * SECURITY: Only allows update if lead belongs to req.user
    */
   updateLead: async (req, res, next) => {
     try {
@@ -133,9 +165,9 @@ export const leadController = {
         throw new AppError(`Status must be one of: ${validStatuses.join(', ')}`, 400);
       }
 
-      // Call service layer
-      // const lead = await leadService.update(id, updates);
-      const lead = { id, ...updates, updatedAt: new Date() }; // Placeholder
+      // Call service layer with user ID for ownership verification
+      // CRITICAL: Service will verify the lead belongs to this user
+      const lead = await leadService.update(id, updates, req.user.id);
 
       res.status(200).json({
         success: true,
@@ -148,8 +180,10 @@ export const leadController = {
   },
 
   /**
-   * Delete lead
+   * Delete lead (with ownership verification)
    * DELETE /api/v1/leads/:id
+   * 
+   * SECURITY: Only allows deletion if lead belongs to req.user
    */
   deleteLead: async (req, res, next) => {
     try {
@@ -159,8 +193,9 @@ export const leadController = {
         throw new AppError('Lead ID is required', 400);
       }
 
-      // Call service layer
-      // await leadService.delete(id);
+      // Call service layer with user ID for ownership verification
+      // CRITICAL: Service will verify the lead belongs to this user
+      await leadService.delete(id, req.user.id);
 
       res.status(200).json({
         success: true,

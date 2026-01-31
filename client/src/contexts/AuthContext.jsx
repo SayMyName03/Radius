@@ -158,7 +158,7 @@ export const AuthProvider = ({ children }) => {
    * 
    * @param {string} googleToken - JWT from Google OAuth callback
    */
-  const loginWithGoogle = (googleToken) => {
+  const loginWithGoogle = async (googleToken) => {
     try {
       setToken(googleToken);
       
@@ -166,15 +166,19 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.setItem('authToken', googleToken);
       window.authToken = googleToken;
 
-      // Fetch user info
-      getMe().then(response => {
-        setUser(response.data.user);
-        console.log('[Auth] Google login successful:', response.data.user.email);
-      }).catch(err => {
-        console.error('Failed to fetch user after Google login:', err);
-        logout();
-      });
+      // Fetch user info - wait for it to complete
+      const response = await getMe();
+      setUser(response.data.user);
+      console.log('[Auth] Google login successful:', response.data.user.email);
+      
+      return response.data.user;
     } catch (err) {
+      console.error('Failed to fetch user after Google login:', err);
+      // Clear invalid token
+      sessionStorage.removeItem('authToken');
+      window.authToken = null;
+      setToken(null);
+      
       const message = err.message || 'Google login failed';
       setError(message);
       throw new Error(message);

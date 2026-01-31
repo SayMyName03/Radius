@@ -121,7 +121,7 @@ const AuthPage = () => {
         {/* Logo/Brand */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight mb-2">
-            LeadGen
+            Radius
           </h1>
           <p className="text-gray-600 text-sm">
             {isLogin ? 'Welcome back' : 'Create your account'}
