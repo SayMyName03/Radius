@@ -4,6 +4,7 @@ import AppLayout from './components/layout/AppLayout';
 import CreateScrapeJob from './components/CreateScrapeJob';
 import LeadsList from './components/LeadsList';
 import Dashboard from './components/Dashboard';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 import LandingPage from './components/LandingPage';
 import AuthPage from './components/AuthPage';
 import AuthCallback from './components/AuthCallback';
@@ -66,6 +67,7 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/create-job" element={<CreateScrapeJob />} />
                 <Route path="/leads" element={<LeadsList />} />
+                <Route path="/analytics" element={<AnalyticsDashboard />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </AppLayout>
